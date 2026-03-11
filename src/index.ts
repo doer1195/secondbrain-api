@@ -36,8 +36,10 @@ app.get('/api/data/:filename', async (c) => {
   const filename = c.req.param('filename')
   const res = await githubRequest(c.env, 'GET', `data/${filename}.md`)
   
-  console.log(JSON.stringify(res,null,2) , "ㅇㅅㅇ")
-  if (!res.ok) return c.json({ error: 'Not found' }, 404)
+// res.clone()을 안 하면 본문을 한 번 읽었을 때 코드가 멈출 수 있습니다.
+const debugBody = await res.clone().json().catch(() => ({ msg: "JSON 아님" }));
+
+console.log("깃허브 응답 본문:", JSON.stringify(debugBody, null, 2));  if (!res.ok) return c.json({ error: 'Not found' }, 404)
 
 
   
