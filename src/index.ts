@@ -36,7 +36,7 @@ app.get('/api/data/:filename', async (c) => {
   const filename = c.req.param('filename')
   const res = await githubRequest(c.env, 'GET', `data/${filename}.md`)
   
-  console.log(JSON.stringify(res))
+  console.log(JSON.stringify(res) , "ㅇㅅㅇ")
   if (!res.ok) return c.json({ error: 'Not found' }, 404)
 
 
