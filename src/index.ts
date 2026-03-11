@@ -36,18 +36,38 @@ app.get('/api/data/:filename', async (c) => {
   const filename = c.req.param('filename')
   const res = await githubRequest(c.env, 'GET', `data/${filename}.md`)
   
-// res.clone()을 안 하면 본문을 한 번 읽었을 때 코드가 멈출 수 있습니다.
-const debugBody = await res.clone().json().catch(() => ({ msg: "JSON 아님" }));
-
-console.log("깃허브 응답 본문:", JSON.stringify(debugBody, null, 2));  if (!res.ok) return c.json({ error: 'Not found' }, 404)
-
-
   
   const data = await res.json()
   // GitHub API는 내용을 Base64로 전달하므로 원래 문자열로 디코딩
   const content = Buffer.from(data.content, 'base64').toString('utf-8')
   
   return c.json({ content, sha: data.sha })
+})
+
+// [R] 전체 목록 읽기 (GET /api/data)
+app.get('/api/data', async (c) => {
+  // 특정 파일명이 아니라 'data' 폴더 경로만 넘깁니다.
+  const res = await githubRequest(c.env, 'GET', 'data')
+  
+  if (!res.ok) {
+    // 폴더가 아예 없거나 권한 문제일 경우
+    return c.json({ error: '목록을 불러올 수 없습니다.' }, res.status as any)
+  }
+  
+  const files = await res.json()
+  
+  // 깃허브가 준 전체 정보 중 필요한 것만 골라서 깔끔하게 가공합니다.
+  const fileList = files
+    .filter(file => file.name.endsWith('.md')) // 마크다운 파일만 필터링
+    .map(file => ({
+      name: file.name,
+      title: file.name.replace('.md', ''), // 확장자 제거한 제목
+      sha: file.sha,
+      size: file.size,
+      download_url: file.download_url
+    }))
+  
+  return c.json(fileList)
 })
 
 // [C] 생성 (POST /api/data/파일명)
