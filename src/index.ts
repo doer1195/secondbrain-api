@@ -35,7 +35,7 @@ const getFileSha = async (env, path) => {
 app.get('/api/data/:filename', async (c) => {
   const filename = c.req.param('filename')
   const res = await githubRequest(c.env, 'GET', `data/${filename}.md`)
-  console.log(res + "ㅇㅅㅇ")
+  console.log(res.json() + "ㅇㅅㅇ")
   
   if (!res.ok) return c.json({ error: 'Not found' }, 404)
   
