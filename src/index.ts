@@ -35,12 +35,13 @@ const getFileSha = async (env, path) => {
 app.get('/api/data/:filename', async (c) => {
   const filename = c.req.param('filename')
   const res = await githubRequest(c.env, 'GET', `data/${filename}.md`)
-  const data = await res.json()  
-
-  console.log(data + "ㅇㅅㅇ")
-  if (!res.ok) return c.json({ error: 'Not found' }, 404)
   
+  console.log(JSON.stringify(res))
+  if (!res.ok) return c.json({ error: 'Not found' }, 404)
 
+
+  
+  const data = await res.json()
   // GitHub API는 내용을 Base64로 전달하므로 원래 문자열로 디코딩
   const content = Buffer.from(data.content, 'base64').toString('utf-8')
   
