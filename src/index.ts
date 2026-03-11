@@ -10,7 +10,10 @@ const githubRequest = async (env, method, path, body = null) => {
   const headers = {
     'Authorization': `Bearer ${env.GITHUB_TOKEN}`,
     'Accept': 'application/vnd.github.v3+json',
-    'User-Agent': 'SecondBrain-API' // GitHub API는 User-Agent를 필수로 요구함
+    'User-Agent': 'SecondBrain-API',
+    'Access-Control-Allow-Origin': '*', // 혹은 특정 도메인
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
   }
   
   const options = { method, headers }
